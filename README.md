@@ -2,10 +2,10 @@
 
 **NOTE: This is not an officially supported Google product.**
 
-This repository contains an open source version of the HTML5 crreative converter
+This repository contains an open source version of the HTML5 creative converter
 tool for DFP, previously living as a service at https://html5-to-dfp.appspot.com/.
 
-Html5 to DFP makes it easy for traffickers to upload HTML5 creative bundles (.zip files) from Adobe Edge and Google Web Designer to DFP as custom creatives.
+HTML5 to DFP makes it easy for traffickers to upload to DFP as custom creatives, HTML5 creative bundles (.zip files) created in Adobe Edge and Google Web Designer.
 
 Please note that **HTML5 creative bundles are now directly supported in DFP** - you can upload them as easily as any other asset by using the new HTML5 creative type.
 
@@ -13,15 +13,21 @@ A [detailed Help Center article](https://support.google.com/dfp_premium/answer/7
 
 ## Installation
 
-This project can be run with minimal configuration on your local machine,
-using the development appserver provided by the Cloud SDK.
+The preferred way of running this project is as a standalone Appengine
+application. Running it on your local machine is also possible, either
+to test changes to the source code, or as a quick way of uploading a
+single bundle.
+
+To run on your local machine, all you need is the development appserver
+provided by the Cloud SDK.
 
 Running it on a live Appengine instance is slightly more complex, but
-is of course the right solution if more than one person needs to use
-this service, or if you don't want to worry about managing the
-development server.
+allows you to support multiple users, without worrying about managing
+the development server.
 
 ### Local prerequisites
+
+On your local machine, you need:
 
 * the [Google Cloud SDK for Appengine Standard Environment](https://cloud.google.com/appengine/docs/standard/python/download)
 * a version of Python 2.7
@@ -36,6 +42,8 @@ pip install -t lib googleads
 ```
 
 ### Google Cloud console configuration
+
+On the Google Cloud side, you need:
 
 * a (possibly dedicated) project
 * one set of credentials for each environment you plan on running
