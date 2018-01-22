@@ -38,6 +38,9 @@ if APP_NAME == 'replace-with-your-project-id':
   CLIENT_ID = (
       'replace-with-your-production-client-id.apps.googleusercontent.com'
   )
+  # In case you wish to enable Google Analytics usage tracking,
+  # uncomment the following line and use your GA code
+  # GA_UA = 'UA-XXXXXXXX-X'
 elif SERVER_SOFTWARE.startswith('Development'):
   # Put your development server credentials here
   DEBUG = bool(os.environ.get('DEBUG', True))
@@ -48,3 +51,5 @@ elif SERVER_SOFTWARE.startswith('Development'):
 else:
   CLIENT_ID = None
   logger.critical('Not in development and application id %s unknown.', APP_NAME)
+
+
