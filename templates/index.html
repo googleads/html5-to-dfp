@@ -1,0 +1,129 @@
+<!--
+    Copyright 2018 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+{% extends "base.html" %}
+{% block content %}
+<!--h2>Upload HTML5 bundle</h2-->
+
+<h3>About this tool</h3>
+<p>This tool makes it easy for you to upload HTML5 creative bundles (.zip files) from Adobe Edge and Google Web Designer to DFP.</p>
+
+<form method="post" enctype="multipart/form-data" id="form" action="{{upload_action}}"
+      onsubmit="return this.acknowledge.checked">
+  <input type="hidden" id="xsrf_token" name="xsrf_token" value="{{xsrf_token|safe}}" />
+  <h3>Step 1: Choose your DFP network</h3>
+  <p>
+    You will see multiple networks in this drop down if you have an
+    account in more than one network. Please be sure to choose the
+    correct network you with to upload this HTML5 creative bundle to.
+  </p>
+  <p>
+    <select name="network" id="network">
+      {% for network in x5_networks %}
+      <option value="{{network.code}}">{{network.name}} ({{network.code}})</option>
+      {% endfor %}
+    </select>
+  </p>
+  <h3>Step 2: Choose your HTML5 creative bundle (.zip file)</h3>
+  <p>
+  The tool currently supports Adobe Edge, Google Web Designer and Tumult Hype zip files.
+  Other HTML5 creative types will still be processed, but the upload could fail or create
+  unexpected problems with the uploaded creative.
+  <br />
+  We recommend to carefully inspect all uploaded creatives (Edge, Hype, GWD or otherwise)
+  before using them on your pages.
+  <br />
+  Make sure that your creative bundle doesn't contain unsupported assets (e.g. SVG, WebFonts, video
+  files), as the tool will discard unsupported assets and the uploaded creative might have rendering
+  issues.
+  Refer to
+    <a href="https://support.google.com/dfp_premium/answer/3163581?hl=en">
+      this DFP Help Center article
+    </a>
+  for supported file types.
+  </p>
+  <p>
+    <input type="file" name="zipfile" id="zipfile" required/>
+  </p>
+  <h3>Step 3: Upload to the tool</h3>
+  <p>
+    When you are ready - submit your file which will upload it to our
+    servers. We will extract its contents (including any images,
+    javascripts etc) and generate some HTML. You will be able to review the
+    output before you push to DFP.
+  </p>
+  <p>
+    <label>
+        <input type="checkbox" name="acknowledge" id="acknowledge" required/>
+        I have all necessary rights to use and modify the creatives
+        utilized in conjunction with this tool.
+    </label>
+  </p>
+  <p>
+    <input type="submit" name="submit" value="Submit" class="btn btn-danger"/>
+  </p>
+</form>
+
+<h3>Recent uploads</h3>
+<p>Review your previous uploads here. This information will be deleted from the server in 24 hours.</p>
+
+{% if x5_transforms %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>file name</th>
+      <th>network code</th>
+      <th>status</th>
+      <th>uploaded</th>
+      <th>modified</th>
+      <th>actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for t in x5_transforms %}
+  <tr>
+    <td>{{t.filename}}</td>
+    <td>{{t.network_code}}</td>
+    <td>
+      {% if t.creative_id %}
+      uploaded to DFP
+      {% else %}
+      ready for review
+      {% endif %}
+    </td>
+    <td>{{t.created.strftime('%b %d %Y %T')}}</td>
+    <td>
+      {% if t.modified %}
+      {{t.modified.strftime('%b %d %Y %T')}}
+      {% endif %}
+    </td>
+    <td>
+      {% if t.creative_id %}
+      <a href="{{t.creative_preview}}" class="text-danger">preview</a>
+      |
+      <a href="https://www.google.com/dfp/{{t.network_code}}#delivery/CreativeDetail/creativeId={{t.creative_id}}" class="text-danger">view in DFP</a>
+      {% else %}
+      <a href="/metadata/{{t.network_code}}/{{t.key.urlsafe()}}/" class="text-danger">review for upload</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No recent uploads found for this user.</p>
+{% endif %}
+{% endblock %}

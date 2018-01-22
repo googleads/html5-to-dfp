@@ -1,0 +1,186 @@
+<!--
+    Copyright 2018 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        https://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+{% extends "base.html" %}
+{% block extrahead %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css" />
+<script>
+  var x5 = {
+    transform: {},
+    assets: {},
+    snippets: []
+  };
+  try {
+    x5.transform = JSON.parse(atob('{{transform|x5_encode}}'));
+    x5.assets = JSON.parse(atob('{{assets|x5_encode}}'));
+    x5.snippets = JSON.parse(atob('{{snippets|x5_encode}}'));
+  } catch (e) {
+    // do something
+  }
+</script>
+<script src="/static/metadata.js"></script>
+<style type="text/css">
+  .boxed { height: 420px; overflow: auto; }
+  .boxed pre { border: solid 1px #ddd; border-top: none; background: #fff; }
+  .boxed table { border: none; }
+  .boxed.right { border: solid 1px #ddd; border-top: none; }
+  .boxed pre, .boxed code { overflow: visible; }
+  form { margin-bottom: 1em; }
+  form label small { color: #c7254e; font-weight: normal; font-style: italic; }
+  #preview { border-left: solid 1px #ddd; }
+  #assets { font-size: small; width: 100%; }
+  #assets tr.bundle { color: #999; }
+  #assets td.name {}
+  #legend { margin-top: 0.5em; }
+  .nav>li>a { padding: 5px 10px; }
+  .legend { float: left; margin-right: 1.5em; }
+  .legend span { margin-right: 0.5em; }
+  .red { color: #ff0000; }
+  .green { color: #00ff00; }
+  .yellow { color: #ffff00; }
+  .orange { color: #ff6600; }
+  .gray { color: #999; }
+
+  /* Pretty printing styles. Used with prettify.js. */
+  /* Vim sunburst theme by David Leibovic */
+  pre .str, code .str { color: #65B042; } /* string  - green */
+  pre .kwd, code .kwd { color: #E28964; } /* keyword - dark pink */
+  pre .com, code .com { color: #AEAEAE; font-style: italic; } /* comment - gray */
+  pre .typ, code .typ { color: #89bdff; } /* type - light blue */
+  pre .lit, code .lit { color: #3387CC; } /* literal - blue */
+  pre .pun, code .pun { color: #fff; } /* punctuation - white */
+  pre .pln, code .pln { color: #fff; } /* plaintext - white */
+  pre .tag, code .tag { color: #89bdff; } /* html/xml tag    - light blue */
+  pre .atn, code .atn { color: #bdb76b; } /* html/xml attribute name  - khaki */
+  pre .atv, code .atv { color: #65B042; } /* html/xml attribute value - green */
+  pre .dec, code .dec { color: #3387CC; } /* decimal - blue */
+  pre.prettyprint, code.prettyprint { background-color: #000; }
+  pre.prettyprint { margin: 1em auto; padding: 1em; white-space: pre-wrap; }
+  /* Specify class=linenums on a pre to get line numbering */
+  ol.linenums { margin-top: 0; margin-bottom: 0; color: #AEAEAE; } /* IE indents via margin-left */
+  li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8 { list-style-type: none }
+  /* Alternate shading for lines */
+  li.L1,li.L3,li.L5,li.L7,li.L9 { }
+  @media print {
+      pre .str, code .str { color: #060; }
+      pre .kwd, code .kwd { color: #006; font-weight: bold; }
+      pre .com, code .com { color: #600; font-style: italic; }
+      pre .typ, code .typ { color: #404; font-weight: bold; }
+      pre .lit, code .lit { color: #044; }
+      pre .pun, code .pun { color: #440; }
+      pre .pln, code .pln { color: #000; }
+      pre .tag, code .tag { color: #006; font-weight: bold; }
+      pre .atn, code .atn { color: #404; }
+      pre .atv, code .atv { color: #060; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h3 class="col-md-12">Step 4: Review and upload the conversion</h3>
+  <!-- X5 {{transform.filename}} for network {{transform.network_code}} -->
+</div>
+<div class="row">
+    <p class="col-md-12">
+      The converted HTML5 creative from <code>{{transform.filename}}</code> is shown below, and will be uploaded to DFP
+      as a custom creative once you submit the form.
+    </p>
+</div>
+<form method="post" class="form-inline">
+  <input type="hidden" id="xsrf_token" name="xsrf_token" value="{{xsrf_token|safe}}" />
+  <div class="row">
+    <div class="col-md-4 form-group">
+      <label for="snippets">Snippet</label>
+      <br />
+      <select name="snippet_id" id="snippets" style="width: 100%;"></select>
+    </div>
+    <div class="col-md-4 form-group">
+      <label for="advertisers">Advertiser ID <small>required</small></label>
+      <img id="advertisers_spinner" src="/static/spinning.gif" style="display: inline; visibility: hidden;" />
+      <br />
+      <input name="advertiser_id" id="advertiser_id"
+          placeholder="id or type for autocomplete" pattern="[0-9]+"
+          style="width: 100%;" required />
+    </div>
+    <div class="col-md-4 form-group">
+      <label for="creative_name">Creative Name</label>
+      <br />
+      <input type="text" name="creative_name" placeholder="X5 {{transform.filename}} {{transform.x5_id}}" style="width: 100%;" />
+    </div>
+  </div>
+  <div class="row">
+      <!--div class="form-group">
+        <label for="interstitial">Interstitial</label>
+        <br />
+        <input type="checkbox" name="interstitial" value="1" />
+      </div-->
+    <div class="col-md-4 form-group">
+      <label for="size">Size <small>required</small></label>
+      <br />
+      <input type="text" name="size" placeholder="wxh eg 300x250"
+          pattern="[0-9x]+" style="width: 100%" required />
+    </div>
+    <div class="col-md-4 form-group">
+      <label for="clickthrough_url">Clickthrough URL <small>required</small></label>
+      <br />
+      <input type="text" name="url" pattern="https?://.+"
+          placeholder="http://example.com/path/" style="width: 100%;" required />
+    </div>
+    <div class="col-md-4 form-group">
+      &nbsp;
+      <br />
+      <input type="submit" name="submit" value="Upload to network {{transform.network_code}}" class="btn btn-danger" />
+    </div>
+  </div>
+</form>
+<div class="row">
+  <div class="col-md-6">
+    <ul class="nav nav-tabs" role="tablist" id="tabs">
+      <li role="presentation" class="active"><a href="#converted" aria-controls="converted" role="tab" data-toggle="tab">Converted</a></li>
+      <li role="presentation"><a href="#original" aria-controls="original" role="tab" data-toggle="tab">Original</a></li>
+    </ul>
+    <div id="preview" class="boxed">
+      <div class="tab-content">
+        <div id="converted" class="tab-pane active" role="tabpanel">
+          <pre class="prettyprint lang-html"></pre>
+        </div>
+        <div id="original" class="tab-pane" role="tabpanel">
+          <pre class="prettyprint lang-html"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="active"><a href="#">Assets</a></li>
+    </ul>
+    <div class="boxed right">
+      <table id="assets" class="table-condensed">
+        <thead>
+          <tr><th></th><th>name</th><th>macro</th><th>mimetype</th><th>size</th><th>num</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="row" id="legend">
+</div>
+{% endblock %}
