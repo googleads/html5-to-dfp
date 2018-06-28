@@ -38,7 +38,7 @@ folder to download the third party packages required by this project:
 
 ``` shell
 mkdir -p lib
-pip install -t lib googleads
+pip install -t lib googleads==9.0.0
 ```
 
 ### Google Cloud console configuration
